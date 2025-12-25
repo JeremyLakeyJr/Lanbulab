@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.jeremylakeyjr.lanbulab.data.PrintJobRepository
 import com.jeremylakeyjr.lanbulab.data.model.JobStatus
-import com.jeremylakeyjr.lanbulab.data.model.PrintJob
 import com.jeremylakeyjr.lanbulab.databinding.FragmentPrintJobsBinding
+import kotlinx.coroutines.launch
 
 class PrintJobsFragment : Fragment() {
     
@@ -17,7 +19,7 @@ class PrintJobsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var adapter: PrintJobsAdapter
-    private val printJobs = mutableListOf<PrintJob>()
+    private lateinit var printJobRepository: PrintJobRepository
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,52 +33,73 @@ class PrintJobsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        printJobRepository = PrintJobRepository(requireContext())
+        
         setupRecyclerView()
-        loadPrintJobs()
+        observePrintJobs()
     }
     
     private fun setupRecyclerView() {
         adapter = PrintJobsAdapter(
             onJobClick = { job ->
-                Toast.makeText(context, "Job: ${job.fileName}", Toast.LENGTH_SHORT).show()
+                // Show dialog to send to printer if pending
+                if (job.status == JobStatus.PENDING) {
+                    showSelectPrinterDialog(job)
+                } else {
+                    Toast.makeText(context, "Job: ${job.fileName} - ${job.status.name}", Toast.LENGTH_SHORT).show()
+                }
             },
             onCancelClick = { job ->
                 cancelJob(job)
+            },
+            onDeleteClick = { job ->
+                deleteJob(job)
             }
         )
         binding.jobsRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.jobsRecyclerView.adapter = adapter
     }
     
-    private fun loadPrintJobs() {
-        // In production, load from database or API
-        // For now, show sample data
-        printJobs.clear()
-        printJobs.addAll(listOf(
-            PrintJob(
-                id = "1",
-                fileName = "sample_model.gcode",
-                filePath = "/storage/sliced/sample_model.gcode",
-                printerId = "printer_1",
-                status = JobStatus.COMPLETED
-            ),
-            PrintJob(
-                id = "2",
-                fileName = "test_print.gcode",
-                filePath = "/storage/sliced/test_print.gcode",
-                printerId = "printer_1",
-                status = JobStatus.PRINTING
-            )
-        ))
-        
-        adapter.submitList(printJobs)
-        
-        binding.emptyView.visibility = if (printJobs.isEmpty()) View.VISIBLE else View.GONE
+    private fun showSelectPrinterDialog(job: com.jeremylakeyjr.lanbulab.data.model.PrintJob) {
+        val dialog = SelectPrinterDialogFragment.newInstance(job)
+        dialog.show(childFragmentManager, "select_printer")
     }
     
-    private fun cancelJob(job: PrintJob) {
-        Toast.makeText(context, "Cancelling job: ${job.fileName}", Toast.LENGTH_SHORT).show()
-        // In production, send cancel command to printer
+    private fun observePrintJobs() {
+        lifecycleScope.launch {
+            printJobRepository.printJobs.collect { jobs ->
+                adapter.submitList(jobs)
+                binding.emptyView.visibility = if (jobs.isEmpty()) View.VISIBLE else View.GONE
+            }
+        }
+    }
+    
+    private fun cancelJob(job: com.jeremylakeyjr.lanbulab.data.model.PrintJob) {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Cancel Print Job")
+            .setMessage("Are you sure you want to cancel ${job.fileName}?")
+            .setPositiveButton("Cancel Job") { _, _ ->
+                lifecycleScope.launch {
+                    printJobRepository.updateJobStatus(job.id, JobStatus.CANCELLED)
+                    Toast.makeText(context, "Job cancelled", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+    
+    private fun deleteJob(job: com.jeremylakeyjr.lanbulab.data.model.PrintJob) {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Print Job")
+            .setMessage("Remove ${job.fileName} from history?")
+            .setPositiveButton("Delete") { _, _ ->
+                lifecycleScope.launch {
+                    printJobRepository.removeJob(job.id)
+                    Toast.makeText(context, "Job deleted", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     override fun onDestroyView() {

@@ -11,7 +11,8 @@ import com.jeremylakeyjr.lanbulab.databinding.ItemPrintJobBinding
 
 class PrintJobsAdapter(
     private val onJobClick: (PrintJob) -> Unit,
-    private val onCancelClick: (PrintJob) -> Unit
+    private val onCancelClick: (PrintJob) -> Unit,
+    private val onDeleteClick: (PrintJob) -> Unit = {}
 ) : ListAdapter<PrintJob, PrintJobsAdapter.JobViewHolder>(JobDiffCallback()) {
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobViewHolder {
@@ -43,6 +44,11 @@ class PrintJobsAdapter(
             
             binding.root.setOnClickListener {
                 onJobClick(job)
+            }
+            
+            binding.root.setOnLongClickListener {
+                onDeleteClick(job)
+                true
             }
             
             binding.cancelButton.setOnClickListener {
