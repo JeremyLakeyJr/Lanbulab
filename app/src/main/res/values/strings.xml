@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lanbulab</string>
+    
+    <!-- Printer strings -->
+    <string name="printers_title">My Printers</string>
+    <string name="scan_printers">Scan</string>
+    <string name="add_printer">Add</string>
+    <string name="no_printers_found">No printers found</string>
+    <string name="printer_online">Online</string>
+    <string name="printer_offline">Offline</string>
+    
+    <!-- MakerWorld strings -->
+    <string name="makerworld_title">MakerWorld</string>
+    <string name="search_models">Search models...</string>
+    <string name="search">Search</string>
+    <string name="refresh">Refresh</string>
+    <string name="slice">Slice</string>
+    <string name="download">Download</string>
+    
+    <!-- Print Jobs strings -->
+    <string name="print_jobs_title">Print Jobs</string>
+    <string name="no_print_jobs">No print jobs yet</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Slice Settings strings -->
+    <string name="slice_settings_title">Slice Settings</string>
+    <string name="layer_height">Layer Height (mm)</string>
+    <string name="infill_density">Infill Density (%)</string>
+    <string name="print_speed">Print Speed (%)</string>
+    <string name="filament_type">Filament Type</string>
+    <string name="bed_temperature">Bed Temperature (°C)</string>
+    <string name="nozzle_temperature">Nozzle Temperature (°C)</string>
+    <string name="enable_supports">Enable Supports</string>
+    <string name="slice_model">Slice Model</string>
+    
+    <!-- Status messages -->
+    <string name="downloading_model">Downloading model...</string>
+    <string name="slicing_model">Slicing model...</string>
+    <string name="model_sliced_successfully">Model sliced successfully!</string>
+    <string name="failed_to_download_model">Failed to download model</string>
+    <string name="failed_to_slice_model">Failed to slice model</string>
+    <string name="error">Error: %1$s</string>
+</resources>

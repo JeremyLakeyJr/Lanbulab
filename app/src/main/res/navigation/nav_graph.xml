@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/printersFragment">
+
+    <fragment
+        android:id="@+id/printersFragment"
+        android:name="com.jeremylakeyjr.lanbulab.ui.printers.PrintersFragment"
+        android:label="Printers" />
+
+    <fragment
+        android:id="@+id/makerWorldFragment"
+        android:name="com.jeremylakeyjr.lanbulab.ui.makerworld.MakerWorldFragment"
+        android:label="MakerWorld" />
+
+    <fragment
+        android:id="@+id/printJobsFragment"
+        android:name="com.jeremylakeyjr.lanbulab.ui.printjobs.PrintJobsFragment"
+        android:label="Print Jobs" />
+
+</navigation>
