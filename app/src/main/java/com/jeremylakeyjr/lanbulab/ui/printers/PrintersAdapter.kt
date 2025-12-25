@@ -9,7 +9,8 @@ import com.jeremylakeyjr.lanbulab.data.model.BambuPrinter
 import com.jeremylakeyjr.lanbulab.databinding.ItemPrinterBinding
 
 class PrintersAdapter(
-    private val onPrinterClick: (BambuPrinter) -> Unit
+    private val onPrinterClick: (BambuPrinter) -> Unit,
+    private val onPrinterLongClick: (BambuPrinter) -> Boolean = { false }
 ) : ListAdapter<BambuPrinter, PrintersAdapter.PrinterViewHolder>(PrinterDiffCallback()) {
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PrinterViewHolder {
@@ -37,6 +38,10 @@ class PrintersAdapter(
             
             binding.root.setOnClickListener {
                 onPrinterClick(printer)
+            }
+            
+            binding.root.setOnLongClickListener {
+                onPrinterLongClick(printer)
             }
         }
     }

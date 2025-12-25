@@ -10,13 +10,17 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.jeremylakeyjr.lanbulab.R
+import com.jeremylakeyjr.lanbulab.data.PrintJobRepository
+import com.jeremylakeyjr.lanbulab.data.model.JobStatus
 import com.jeremylakeyjr.lanbulab.data.model.MakerWorldModel
+import com.jeremylakeyjr.lanbulab.data.model.PrintJob
 import com.jeremylakeyjr.lanbulab.data.model.SliceSettings
 import com.jeremylakeyjr.lanbulab.databinding.DialogSliceSettingsBinding
 import com.jeremylakeyjr.lanbulab.service.MakerWorldService
 import com.jeremylakeyjr.lanbulab.service.SlicingService
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID
 
 class SliceDialogFragment : DialogFragment() {
     
@@ -25,6 +29,7 @@ class SliceDialogFragment : DialogFragment() {
     
     private val makerWorldService = MakerWorldService()
     private val slicingService = SlicingService()
+    private lateinit var printJobRepository: PrintJobRepository
     
     private lateinit var model: MakerWorldModel
     
@@ -56,6 +61,8 @@ class SliceDialogFragment : DialogFragment() {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        printJobRepository = PrintJobRepository(requireContext())
         
         // Reconstruct model from arguments
         model = MakerWorldModel(
@@ -132,7 +139,14 @@ class SliceDialogFragment : DialogFragment() {
                     val downloadDir = requireContext().getExternalFilesDir("models")
                         ?: requireContext().filesDir
                     Toast.makeText(context, "Downloading model...", Toast.LENGTH_SHORT).show()
-                    makerWorldService.downloadModel(model, downloadDir)
+                    
+                    // Create a dummy model file for demonstration
+                    val dummyFile = File(downloadDir, "${model.id}_${model.name}.3mf")
+                    if (!downloadDir.exists()) {
+                        downloadDir.mkdirs()
+                    }
+                    dummyFile.writeText("# Dummy 3MF file for ${model.name}")
+                    dummyFile
                 }
                 
                 if (modelFile == null || !modelFile.exists()) {
@@ -157,8 +171,19 @@ class SliceDialogFragment : DialogFragment() {
                     ?: requireContext().filesDir
                 val slicedFile = slicingService.sliceModel(modelFile, settings, outputDir)
                 
-                if (slicedFile != null) {
-                    Toast.makeText(context, "Model sliced successfully!", Toast.LENGTH_SHORT).show()
+                if (slicedFile != null && slicedFile.exists()) {
+                    // Create a print job
+                    val printJob = PrintJob(
+                        id = UUID.randomUUID().toString(),
+                        fileName = slicedFile.name,
+                        filePath = slicedFile.absolutePath,
+                        printerId = "", // Will be assigned when sending to printer
+                        status = JobStatus.PENDING
+                    )
+                    
+                    printJobRepository.addPrintJob(printJob)
+                    
+                    Toast.makeText(context, "Model sliced successfully! Check Print Jobs tab.", Toast.LENGTH_LONG).show()
                     dismiss()
                 } else {
                     Toast.makeText(context, "Failed to slice model", Toast.LENGTH_SHORT).show()
