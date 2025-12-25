@@ -78,19 +78,17 @@ class PrintersFragment : Fragment() {
     }
     
     private fun loadInitialPrinters() {
-        // If no printers, show empty state
-        if (printerRepository.printers.value.isEmpty()) {
-            updateEmptyState(true)
-        }
+        // Initial load complete
+        updateEmptyState(printerRepository.printers.value.isEmpty())
     }
     
     private fun updateEmptyState(isEmpty: Boolean) {
         if (isEmpty) {
             binding.printersRecyclerView.visibility = View.GONE
-            // Create a simple empty state message
-            Toast.makeText(context, "No printers yet. Click 'Add' or 'Scan' to add printers.", Toast.LENGTH_LONG).show()
+            binding.emptyView.visibility = View.VISIBLE
         } else {
             binding.printersRecyclerView.visibility = View.VISIBLE
+            binding.emptyView.visibility = View.GONE
         }
     }
     

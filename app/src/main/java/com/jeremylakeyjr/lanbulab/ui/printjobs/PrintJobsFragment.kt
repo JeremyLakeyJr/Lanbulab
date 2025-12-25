@@ -54,6 +54,9 @@ class PrintJobsFragment : Fragment() {
             },
             onDeleteClick = { job ->
                 deleteJob(job)
+            },
+            onSendClick = { job ->
+                showSelectPrinterDialog(job)
             }
         )
         binding.jobsRecyclerView.layoutManager = LinearLayoutManager(context)

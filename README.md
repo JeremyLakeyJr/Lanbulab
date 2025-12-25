@@ -4,43 +4,72 @@ Android app for Bambu Lab LAN-only printers with integrated slicing and MakerWor
 
 ## Features
 
-- **LAN Printer Discovery**: Automatically discover Bambu Lab printers on your local network
-- **Printer Management**: Add, monitor, and control your printers
-- **MakerWorld Integration**: Browse and download models from MakerWorld library
-- **Integrated Slicing**: Slice models directly from MakerWorld with customizable settings
-- **Print Job Management**: Track and manage your print jobs
-- **Send to Printer**: Upload sliced files and start prints directly from the app
+- **LAN Printer Management**: Add printers manually or discover them on your local network
+- **Printer Management**: Add, monitor, delete, and manage your printers with persistent storage
+- **MakerWorld Integration**: Browse sample models from a curated library
+- **Integrated Slicing**: Slice models directly with customizable settings and generate G-code
+- **Print Job Management**: Track print jobs, send to printers, and manage history
+- **Send to Printer**: Select printer and upload G-code files
 
 ## Key Components
 
 ### Printer Management
 - Automatic network discovery of Bambu Lab printers
-- Real-time printer status monitoring
-- Support for multiple printers
+- Manual printer addition with IP address
+- Persistent storage using SharedPreferences
+- Delete printers with long-press
+- Real printer status tracking
 
 ### MakerWorld Browser
-- Browse popular models from MakerWorld
-- Search functionality
-- Direct download of 3D models
-- **Slice button on each model** for quick slicing
+- Browse 8 sample models
+- Search functionality by name, description, or tags
+- Direct slicing from model cards
+- **Slice button on each model** for quick access
 
 ### Slicing Engine
-- Integrated slicing with customizable settings
+- Generates actual G-code files with proper structure
+- Customizable settings: layer height, infill, speed
 - Support for different filament types (PLA, ABS, PETG, TPU)
-- Adjustable layer height, infill, print speed
-- Temperature control
+- Adjustable temperature control
 - Support generation options
+- Creates print jobs automatically after slicing
 
 ### Print Jobs
-- Queue management
-- Job status tracking
-- Cancel running prints
+- View all print jobs with color-coded statuses
+- Send pending jobs to any printer
+- Cancel active jobs
+- Delete completed jobs
+- Persistent job history
+
+## User Workflows
+
+### Adding a Printer
+1. Navigate to "Printers" tab
+2. Tap "Add" button
+3. Enter printer details (name, IP address, access code, model)
+4. Tap "Add Printer"
+5. Printer is now saved and available
+
+### Slicing a Model
+1. Navigate to "MakerWorld" tab
+2. Browse or search for models
+3. Tap "Slice" button on any model
+4. Configure settings (filament type, layer height, infill, temperatures)
+5. Tap "Slice Model"
+6. G-code file is generated and print job is created
+
+### Sending to Printer
+1. Navigate to "Print Jobs" tab
+2. Find your pending job
+3. Tap "Send to Printer" button
+4. Select a printer from the list
+5. Job is uploaded to the printer
 
 ## Requirements
 
 - Android 7.0 (API 24) or higher
-- Local network connection with Bambu Lab printer
-- Internet connection for MakerWorld access
+- Local network connection for printer discovery
+- Storage permissions for saving files
 
 ## Building
 
@@ -54,3 +83,23 @@ Install the APK on your Android device:
 ```bash
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
+
+## Features Implementation Status
+
+✅ Fully functional printer management with persistence
+✅ Manual printer addition with validation
+✅ Printer deletion
+✅ Real G-code generation for slicing
+✅ Complete print job workflow
+✅ Persistent data storage
+✅ Color-coded job statuses
+✅ Empty states for better UX
+✅ Send jobs to printers
+
+## Notes
+
+- All data is stored locally using SharedPreferences
+- G-code files are saved to app-specific storage
+- Printer discovery uses UDP broadcast (may require network permissions)
+- The app is fully functional for demonstration and testing purposes
+
